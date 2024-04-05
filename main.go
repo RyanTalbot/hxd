@@ -21,8 +21,8 @@ func main() {
 	}
 	defer file.Close()
 
-	fileBytes := make([]byte, 16)
-	out := make([]byte, 16)
+	fileBytes := make([]byte, 256)
+	out := make([]byte, 256)
 
 	for {
 		_, err := file.Read(fileBytes)
