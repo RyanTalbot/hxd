@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -11,11 +12,23 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 1 {
+	args := os.Args
+	if len(args) <= 1 {
 		os.Exit(1)
 	}
 
-	file, err := os.Open(os.Args[1])
+	littlEndianFlag := flag.Bool("e", false, "set for little Endian")
+
+	flag.Parse()
+
+	var byteOrder binary.ByteOrder
+	if *littlEndianFlag {
+		byteOrder = binary.LittleEndian
+	} else {
+		byteOrder = binary.BigEndian
+	}
+
+	file, err := os.Open(args[len(args)-1])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,7 +47,7 @@ func main() {
 		}
 
 		buffer := bytes.NewBuffer(fileBytes)
-		err = binary.Read(buffer, binary.BigEndian, &out)
+		err = binary.Read(buffer, byteOrder, &out)
 		if err != nil {
 			log.Fatal(err)
 		}
