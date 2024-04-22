@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -24,13 +25,19 @@ func main() {
 
 	flag.Parse()
 
-	var byteOrder binary.ByteOrder
+	validGroupSizes := []int{0, 2, 4, 8, 16}
 	groupingSize := *groupSizeFlag
-	if *littlEndianFlag {
-		byteOrder = binary.LittleEndian
-		groupingSize = *groupSizeFlag
+	var byteOrder binary.ByteOrder
+
+	if slices.Contains(validGroupSizes, groupingSize) {
+		if *littlEndianFlag {
+			byteOrder = binary.LittleEndian
+			groupingSize = *groupSizeFlag
+		} else {
+			byteOrder = binary.BigEndian
+		}
 	} else {
-		byteOrder = binary.BigEndian
+		log.Fatal("invalid grouping size")
 	}
 
 	file, err := os.Open(args[len(args)-1])
